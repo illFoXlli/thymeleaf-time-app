@@ -1,6 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Time App</title>
@@ -60,17 +59,14 @@
 
 <main>
     <h1>Time App</h1>
-
     <form id="timeForm">
         <input type="number" id="tzInput" placeholder="Enter offset (e.g. 3 or -2)">
         <br>
         <button type="submit">Get Time</button>
     </form>
-
-    <a href="/time">Check UTC Time</a>
+    <a th:href="${baseUrl} + '/time'">Check UTC Time</a>
 </main>
 
-</body>
 <script>
     const form = document.getElementById("timeForm");
     const input = document.getElementById("tzInput");
@@ -78,20 +74,19 @@
     form.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        let value = input.value.trim();
+        const value = input.value.trim();
 
         if (!value) {
             window.location.href = "/time";
             return;
         }
 
-        let sign = value.startsWith("-") ? "" : "+";
+        const sign = value.startsWith("-") ? "" : "+";
+        const timezone = "UTC" + sign + value;
 
-        let timezone = "UTC" + sign + value;
-
-        timezone = encodeURIComponent(timezone);
-
-        window.location.href = "/time?timezone=" + timezone;
+        window.location.href = "/time?timezone=" + encodeURIComponent(timezone);
     });
 </script>
+
+</body>
 </html>

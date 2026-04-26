@@ -1,6 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,7 +41,7 @@
 <body>
 <main>
     <p>Current time</p>
-    <time id="clock">${time}</time>
+    <time id="clock" th:text="${time}"></time>
 </main>
 
 <script>

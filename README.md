@@ -1,73 +1,97 @@
-# Time Servlet App
+# Thymeleaf Time App
 
-Simple Java Servlet application that shows the current time for UTC or for a timezone passed in a query parameter.
+Java Servlet application that renders the current time with Thymeleaf and remembers the last valid timezone in the `lastTimezone` cookie.
 
-## Features
+## Implemented
 
-- `GET /time` returns the current UTC time.
-- `GET /time?timezone=UTC+2` returns the current time for the provided timezone.
+- Thymeleaf is connected to the project.
+- Time rendering is moved to HTML templates.
+- `TimeServlet` calculates the current time for the requested timezone.
+- `TimeServlet` passes data to the Thymeleaf template and returns rendered HTML.
+- The last valid timezone from the `timezone` query parameter is saved to the `lastTimezone` cookie.
+- If `timezone` is missing, the application tries to read `lastTimezone` from cookie.
+- If neither query parameter nor cookie is available, the application uses `UTC`.
 - Invalid timezone values return `400 Bad Request` with `Invalid timezone`.
-- The time page updates every second in the browser without sending a new request to the server.
-- `GET /` opens a simple page with a form for choosing a UTC offset.
 
 ## Technologies
 
-- Java 17
+- Java 21
 - Maven
 - Java Servlet API
-- JSP
+- Thymeleaf
 - Apache Tomcat 9
 
 ## Project Structure
 
 ```text
+src/main/java/org/fox/servlet/IndexServlet.java
 src/main/java/org/fox/servlet/TimeServlet.java
 src/main/java/org/fox/filter/TimezoneValidateFilter.java
 src/main/java/org/fox/service/TimeService.java
-src/main/webapp/index.jsp
-src/main/webapp/time.jsp
+src/main/resources/templates/index.html
+src/main/resources/templates/time.html
 ```
 
-## How to Build
+## Build
 
 ```bash
 mvn package
 ```
 
-The WAR file will be created in:
+Generated artifact:
 
 ```text
-target/time-1.0-SNAPSHOT.war
+target/thymeleaf-time-app-1.0-SNAPSHOT.war
 ```
 
-## How to Run
+## Run
 
-Deploy the generated WAR file to Apache Tomcat 9.
+Deploy the WAR file to Apache Tomcat 9.
 
-After deployment, open:
+If Tomcat deploys the application with the default context path, use:
 
 ```text
-http://localhost:8080/time
+http://localhost:8080/thymeleaf-time-app/
+http://localhost:8080/thymeleaf-time-app/time
+http://localhost:8080/thymeleaf-time-app/time?timezone=UTC+2
 ```
 
-Examples:
+If the application is deployed as `ROOT`, use:
 
 ```text
+http://localhost:8080/
 http://localhost:8080/time
 http://localhost:8080/time?timezone=UTC+2
-http://localhost:8080/time?timezone=Europe/Kiev
 ```
 
-Invalid timezone example:
+## Example Scenario
 
 ```text
-http://localhost:8080/time?timezone=test
+1. GET /time
+   Response: current time in UTC
+
+2. GET /time?timezone=UTC+2
+   Response: current time in UTC+2
+   Side effect: saves lastTimezone=UTC+2 in cookie
+
+3. GET /time
+   Response: current time in UTC+2 from cookie
 ```
 
-Expected response:
+## Invalid Timezone Example
+
+```text
+GET /time?timezone=test
+```
+
+Response:
 
 ```text
 Invalid timezone
 ```
 
-with HTTP status code `400`.
+HTTP status:
+
+```text
+400 Bad Request
+```
