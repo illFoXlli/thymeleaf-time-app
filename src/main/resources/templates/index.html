@@ -2,90 +2,21 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time App</title>
-    <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
-        }
-
-        main {
-            padding: 30px 40px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        input {
-            padding: 10px;
-            width: 220px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            margin-bottom: 15px;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            background: #2563eb;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #1e40af;
-        }
-
-        a {
-            display: block;
-            margin-top: 15px;
-            color: #2563eb;
-            text-decoration: none;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
 </head>
 <body>
 <main>
     <h1>Time App</h1>
-    <form id="timeForm" th:attr="data-base-url=${baseUrl}">
+    <form id="timeForm" th:attr="data-time-url=${timeUrl}">
         <input type="number" id="tzInput" placeholder="Enter offset (e.g. 3 or -2)">
         <br>
         <button type="submit">Get Time</button>
     </form>
-    <a th:href="|${baseUrl}/time|">Open Time</a>
+    <a th:href="@{/time}">Open Time</a>
 </main>
 
-<script>
-    const form = document.getElementById("timeForm");
-    const input = document.getElementById("tzInput");
-    const baseUrl = form.dataset.baseUrl || "";
-
-    form.addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        const value = input.value.trim();
-
-        if (!value) {
-            window.location.href = baseUrl + "/time";
-            return;
-        }
-
-        const sign = value.startsWith("-") ? "" : "+";
-        const timezone = "UTC" + sign + value;
-
-        window.location.href = baseUrl + "/time?timezone=" + encodeURIComponent(timezone);
-    });
-</script>
+<script th:src="@{/js/index.js}"></script>
 </body>
 </html>

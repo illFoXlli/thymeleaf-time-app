@@ -5,13 +5,15 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
+import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.web.servlet.JavaxServletWebApplication;
 
-@WebServlet("/")
+@WebServlet("/home")
 public class IndexServlet extends HttpServlet {
 
     private TemplateEngine templateEngine;
+    private JavaxServletWebApplication webApplication;
 
     @Override
     public void init() {
@@ -23,6 +25,7 @@ public class IndexServlet extends HttpServlet {
 
         templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(resolver);
+        webApplication = JavaxServletWebApplication.buildApplication(getServletContext());
     }
 
     @Override
@@ -31,11 +34,8 @@ public class IndexServlet extends HttpServlet {
         try {
             resp.setContentType("text/html;charset=UTF-8");
 
-            Context context = new Context();
-            String baseUrl = req.getScheme() + "://" +
-                             req.getServerName() + ":" +
-                             req.getServerPort();
-            context.setVariable("baseUrl", baseUrl);
+            WebContext context = new WebContext(webApplication.buildExchange(req, resp));
+            context.setVariable("timeUrl", req.getContextPath() + "/time");
 
             PrintWriter writer = resp.getWriter();
             templateEngine.process("index", context, writer);

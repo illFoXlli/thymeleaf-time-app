@@ -2,8 +2,9 @@ package org.fox.servlet;
 
 import org.fox.service.TimeService;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
+import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.web.servlet.JavaxServletWebApplication;
 
 import javax.servlet.annotation.*;
 import javax.servlet.http.*;
@@ -15,6 +16,7 @@ public class TimeServlet extends HttpServlet {
 
     private final TimeService service = new TimeService();
     private TemplateEngine templateEngine;
+    private JavaxServletWebApplication webApplication;
 
     @Override
     public void init() {
@@ -26,6 +28,7 @@ public class TimeServlet extends HttpServlet {
 
         templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(resolver);
+        webApplication = JavaxServletWebApplication.buildApplication(getServletContext());
     }
 
     @Override
@@ -61,11 +64,7 @@ public class TimeServlet extends HttpServlet {
                 resp.addCookie(cookie);
             }
 
-            Context context = new Context();
-            String baseUrl = req.getScheme() + "://" +
-                             req.getServerName() + ":" +
-                             req.getServerPort();
-            context.setVariable("baseUrl", baseUrl);
+            WebContext context = new WebContext(webApplication.buildExchange(req, resp));
             context.setVariable("time", result);
 
             resp.setContentType("text/html;charset=UTF-8");
