@@ -3,6 +3,7 @@ package org.fox.servlet;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
+import java.io.PrintWriter;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -25,19 +26,32 @@ public class IndexServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
-        resp.setContentType("text/html;charset=UTF-8");
+        try {
+            resp.setContentType("text/html;charset=UTF-8");
 
-        Context context = new Context();
+            Context context = new Context();
+            String baseUrl = req.getScheme() + "://" +
+                             req.getServerName() + ":" +
+                             req.getServerPort();
+            context.setVariable("baseUrl", baseUrl);
 
-        String baseUrl = req.getScheme() + "://" +
-                         req.getServerName() + ":" +
-                         req.getServerPort();
+            PrintWriter writer = resp.getWriter();
+            templateEngine.process("index", context, writer);
+        } catch (Exception e) {
+            handleRenderError(resp, e);
+        }
+    }
 
-        context.setVariable("baseUrl", baseUrl);
+    private void handleRenderError(HttpServletResponse resp, Exception e) {
+        log("Unable to render index page", e);
+        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-        templateEngine.process("index", context, resp.getWriter());
+        try {
+            resp.getWriter().write("Unable to render page");
+        } catch (IOException ioException) {
+            log("Unable to write error response", ioException);
+        }
     }
 }

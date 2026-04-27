@@ -8,6 +8,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import javax.servlet.annotation.*;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @WebServlet("/time")
 public class TimeServlet extends HttpServlet {
@@ -28,42 +29,61 @@ public class TimeServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
-        String timezoneFromQuery = req.getParameter("timezone");
-        String timezone = timezoneFromQuery;
+        try {
+            String timezoneFromQuery = req.getParameter("timezone");
+            String timezone = timezoneFromQuery;
 
-        if (timezone == null || timezone.isEmpty()) {
-            Cookie[] cookies = req.getCookies();
+            if (timezone == null || timezone.isEmpty()) {
+                Cookie[] cookies = req.getCookies();
 
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if ("lastTimezone".equals(cookie.getName())) {
-                        timezone = cookie.getValue();
-                        break;
+                if (cookies != null) {
+                    for (Cookie cookie : cookies) {
+                        if ("lastTimezone".equals(cookie.getName())) {
+                            timezone = cookie.getValue();
+                            break;
+                        }
                     }
                 }
             }
+
+            if (timezone == null || timezone.isEmpty()) {
+                timezone = "UTC";
+            }
+
+            String result = service.getTime(timezone);
+
+            if (timezoneFromQuery != null && !timezoneFromQuery.isEmpty()) {
+                Cookie cookie = new Cookie("lastTimezone", timezoneFromQuery);
+                cookie.setMaxAge(60 * 60 * 24 * 30);
+                cookie.setPath("/");
+                resp.addCookie(cookie);
+            }
+
+            Context context = new Context();
+            String baseUrl = req.getScheme() + "://" +
+                             req.getServerName() + ":" +
+                             req.getServerPort();
+            context.setVariable("baseUrl", baseUrl);
+            context.setVariable("time", result);
+
+            resp.setContentType("text/html;charset=UTF-8");
+            PrintWriter writer = resp.getWriter();
+            templateEngine.process("time", context, writer);
+        } catch (Exception e) {
+            handleRenderError(resp, e);
         }
+    }
 
-        if (timezone == null || timezone.isEmpty()) {
-            timezone = "UTC";
+    private void handleRenderError(HttpServletResponse resp, Exception e) {
+        log("Unable to render time page", e);
+        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+        try {
+            resp.getWriter().write("Unable to render page");
+        } catch (IOException ioException) {
+            log("Unable to write error response", ioException);
         }
-
-        String result = service.getTime(timezone);
-
-        if (timezoneFromQuery != null && !timezoneFromQuery.isEmpty()) {
-            Cookie cookie = new Cookie("lastTimezone", timezoneFromQuery);
-            cookie.setMaxAge(60 * 60 * 24 * 30);
-            cookie.setPath("/");
-            resp.addCookie(cookie);
-        }
-
-        Context context = new Context();
-        context.setVariable("time", result);
-
-        resp.setContentType("text/html;charset=UTF-8");
-        templateEngine.process("time", context, resp.getWriter());
     }
 }

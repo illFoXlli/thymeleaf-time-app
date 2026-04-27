@@ -56,20 +56,20 @@
     </style>
 </head>
 <body>
-
 <main>
     <h1>Time App</h1>
-    <form id="timeForm">
+    <form id="timeForm" th:attr="data-base-url=${baseUrl}">
         <input type="number" id="tzInput" placeholder="Enter offset (e.g. 3 or -2)">
         <br>
         <button type="submit">Get Time</button>
     </form>
-    <a th:href="${baseUrl} + '/time'">Check UTC Time</a>
+    <a th:href="|${baseUrl}/time|">Open Time</a>
 </main>
 
 <script>
     const form = document.getElementById("timeForm");
     const input = document.getElementById("tzInput");
+    const baseUrl = form.dataset.baseUrl || "";
 
     form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -77,16 +77,15 @@
         const value = input.value.trim();
 
         if (!value) {
-            window.location.href = "/time";
+            window.location.href = baseUrl + "/time";
             return;
         }
 
         const sign = value.startsWith("-") ? "" : "+";
         const timezone = "UTC" + sign + value;
 
-        window.location.href = "/time?timezone=" + encodeURIComponent(timezone);
+        window.location.href = baseUrl + "/time?timezone=" + encodeURIComponent(timezone);
     });
 </script>
-
 </body>
 </html>

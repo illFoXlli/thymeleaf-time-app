@@ -1,6 +1,6 @@
 # Thymeleaf Time App
 
-Java Servlet application that renders the current time with Thymeleaf and remembers the last valid timezone in the `lastTimezone` cookie.
+Java Servlet application that renders the current time with Thymeleaf and stores the last valid timezone in the `lastTimezone` cookie.
 
 ## Implemented
 
@@ -48,20 +48,20 @@ target/thymeleaf-time-app-1.0-SNAPSHOT.war
 
 Deploy the WAR file to Apache Tomcat 9.
 
-If Tomcat deploys the application with the default context path, use:
-
-```text
-http://localhost:8080/thymeleaf-time-app/
-http://localhost:8080/thymeleaf-time-app/time
-http://localhost:8080/thymeleaf-time-app/time?timezone=UTC+2
-```
-
 If the application is deployed as `ROOT`, use:
 
 ```text
 http://localhost:8080/
 http://localhost:8080/time
 http://localhost:8080/time?timezone=UTC+2
+```
+
+If Tomcat deploys the application with the default artifact name as context path, use:
+
+```text
+http://localhost:8080/thymeleaf-time-app/
+http://localhost:8080/thymeleaf-time-app/time
+http://localhost:8080/thymeleaf-time-app/time?timezone=UTC+2
 ```
 
 ## Example Scenario
@@ -75,7 +75,7 @@ http://localhost:8080/time?timezone=UTC+2
    Side effect: saves lastTimezone=UTC+2 in cookie
 
 3. GET /time
-   Response: current time in UTC+2 from cookie
+   Response: current time using timezone from cookie
 ```
 
 ## Invalid Timezone Example
