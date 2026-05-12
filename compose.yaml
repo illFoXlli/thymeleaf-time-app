@@ -1,0 +1,12 @@
+services:
+
+  thymeleaf-time-app:
+
+    build: .
+
+    container_name: thymeleaf-time-app
+
+    ports:
+      - "3000:8080"
+
+    restart: unless-stopped
