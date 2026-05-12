@@ -7,6 +7,6 @@ services:
     container_name: thymeleaf-time-app
 
     ports:
-      - "3000:8080"
+      - "3000:8880"
 
     restart: unless-stopped
